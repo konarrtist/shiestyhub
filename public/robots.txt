@@ -1,0 +1,15 @@
+# Bunkerfy - Arc Raiders Trading Hub
+# https://bunkerfy.top
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/callback
+Disallow: /dashboard/messages
+Disallow: /admin/
+
+# Sitemaps
+Sitemap: https://bunkerfy.top/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

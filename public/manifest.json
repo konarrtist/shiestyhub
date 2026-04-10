@@ -1,0 +1,25 @@
+{
+  "name": "Bunkerfy - Arc Raiders Trading Hub",
+  "short_name": "Bunkerfy",
+  "description": "Secure marketplace for trading Arc Raiders in-game items with escrow protection",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0b",
+  "theme_color": "#00d9ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-dark-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["games", "social"],
+  "lang": "en",
+  "dir": "ltr"
+}

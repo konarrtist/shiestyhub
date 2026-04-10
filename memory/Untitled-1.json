@@ -1,0 +1,20 @@
+{
+  "weapons": [
+    "Anvil", "Aphelion", "Arpeggio", "Bettina", "Bobcat", "Burletta", 
+    "Canto", "Deadline", "Dolabra", "Equalizer", "Ferro", "Hairpin", 
+    "Hullcracker", "Il Toro", "Jupiter", "Kettle", "Osprey", "Rattler", 
+    "Renegade", "Showstopper", "Stitcher", "Surge Coil", "Tempest", 
+    "Torrente", "Trailblazer", "Venator", "Vulcano"
+  ],
+  "augments": [
+    "Combat Mk. 3 (Aggressive)", "Combat Mk. 3 (Flanking)", 
+    "Looting Mk. 3 (Safekeeper)", "Looting Mk. 3 (Survivor)", 
+    "Tactical Mk. 3 (Infiltrator)", "Tactical Mk. 3 (Revival)"
+  ],
+  "utility": [
+    "Angled Grip III", "Vertical Grip III", "Compensator III", 
+    "Muzzle Brake III", "Silencer II", "Extended Mag III", 
+    "Defibrillator", "Snap Hook", "Wolfpack", "Seeker Grenade", 
+    "Blaze Grenade", "Pulse Mine", "Gas Mine", "Jolt Mine"
+  ]
+}
