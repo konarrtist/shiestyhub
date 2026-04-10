@@ -1,71 +1,129 @@
-import { createClient } from "@/lib/supabase/server"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Search, Star, TrendingUp, Package, ArrowRightLeft } from "lucide-react"
-import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ListingImage } from "@/components/ui/listing-image"
-import { parsePaymentMethods } from "@/lib/trade-items"
-import { InitiateTradeButton } from "@/components/initiate-trade-button"
+import { createClient } from "../../../../lib/supabase/server";
+import { notFound } from "next/navigation";
+import { 
+  MapPin, 
+  Clock, 
+  ShieldCheck, 
+  ArrowLeft,
+  Star,
+  TrendingUp
+} from "lucide-react";
+import Link from "next/link";
+import { Badge } from "../../../../components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../../components/ui/avatar";
 
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+// DIRECT PATHS: Jumping back 4 levels to the root folders shown in your photo
+import { parsePaymentMethods } from "../../../../lib/trade-items";
+import { InitiateTradeButton } from "../../../../components/initiate-trade-button";
 
-export default async function MarketplacePage({
-  searchParams,
+export const dynamic = "force-dynamic";
+
+export default async function ListingDetailPage({
+  params,
 }: {
-  searchParams: Promise<{ search?: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { search } = await searchParams
-  const supabase = await createClient()
+  const { id } = await params;
+  const supabase = await createClient();
 
-  // Fetch listings from Supabase
-  const { data: listings } = await supabase
+  const { data: listing, error } = await supabase
     .from("listings")
-    .select("*, profiles(username, avatar_url)")
-    .order("created_at", { ascending: false })
+    .select(`
+      *,
+      seller:profiles!listings_seller_id_fkey (
+        id,
+        display_name,
+        username,
+        avatar_url,
+        discord_avatar,
+        rating,
+        total_trades,
+        successful_trades
+      )
+    `)
+    .eq("id", id)
+    .single();
+
+  if (error || !listing) {
+    notFound();
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const isOwnListing = user?.id === listing.seller_id;
+
+  // Safety fallback for the utility function
+  const tradeItems = typeof parsePaymentMethods === 'function' 
+    ? parsePaymentMethods(listing.payment_methods) 
+    : [];
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Marketplace</h2>
-      </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {listings?.map((listing) => (
-          <Card key={listing.id}>
-            <CardHeader>
-              <ListingImage src={listing.image_url} alt={listing.title} />
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-lg">{listing.title}</h3>
-                <Badge variant="secondary">{listing.category}</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-slate-950 min-h-screen text-white">
+      <Link 
+        href="/dashboard/marketplace"
+        className="flex items-center text-sm text-slate-500 hover:text-cyan-500 mb-8 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Marketplace
+      </Link>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Listing Details */}
+        <div className="lg:col-span-2 space-y-8">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Badge className="bg-cyan-500/10 text-cyan-500 border-cyan-500/20">
+                {listing.item_category || "General"}
+              </Badge>
+            </div>
+            
+            <h1 className="text-3xl font-bold text-white mb-4">{listing.title}</h1>
+            
+            <div className="flex flex-wrap gap-4 text-sm text-slate-400 mb-6">
+              <span className="flex items-center">
+                <MapPin className="w-4 h-4 mr-1 text-cyan-500" />
+                {listing.location || "Global"}
+              </span>
+              <span className="flex items-center">
+                <Clock className="w-4 h-4 mr-1 text-cyan-500" />
+                Posted {new Date(listing.created_at).toLocaleDateString()}
+              </span>
+            </div>
+
+            <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
+              <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
+              <p className="whitespace-pre-wrap text-slate-300 leading-relaxed">
                 {listing.description}
               </p>
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={listing.profiles?.avatar_url} />
-                  <AvatarFallback>{listing.profiles?.username?.[0]}</AvatarFallback>
-                </Avatar>
-                <span className="text-xs font-medium">{listing.profiles?.username}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Pricing/Trade Actions */}
+        <div className="space-y-6">
+          <div className="p-6 bg-slate-900/50 rounded-2xl border border-slate-800 shadow-xl">
+            <div className="mb-6">
+              <p className="text-sm text-slate-400 mb-1">Price</p>
+              <p className="text-3xl font-bold text-white">
+                ${listing.price} <span className="text-lg font-normal text-slate-500">Raider Dollars</span>
+              </p>
+            </div>
+
+            {!isOwnListing && listing.status === "active" && (
+              <div className="space-y-3">
+                <InitiateTradeButton
+                  itemId={listing.id}
+                  ownerId={listing.seller_id}
+                  itemName={listing.title}
+                />
+                <div className="flex items-center justify-center gap-2 text-xs text-slate-500 mt-4">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  Secure trade powered by SHiESTY
+                </div>
               </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div className="font-mono font-bold text-primary">
-                {listing.price} $RD
-              </div>
-              <Link href={`/dashboard/marketplace/${listing.id}`}>
-                <Button size="sm">View Details</Button>
-              </Link>
-            </CardFooter>
-          </Card>
-        ))}
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  )
+    </main>
+  );
 }
