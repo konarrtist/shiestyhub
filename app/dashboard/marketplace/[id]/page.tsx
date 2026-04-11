@@ -7,8 +7,7 @@ import { Search, Star, TrendingUp, Package, ArrowRightLeft } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ListingImage } from "@/components/ui/listing-image"
-import { InitiateTradeButton } from "@/components/initiate-trade-button"
-
+import { parsePaymentMethods } from "@/lib/utils/trade-items"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
