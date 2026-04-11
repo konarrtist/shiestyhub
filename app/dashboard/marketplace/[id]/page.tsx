@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 
-export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 export default async function ListingDetailPage({
