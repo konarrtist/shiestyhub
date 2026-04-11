@@ -125,11 +125,17 @@ async function getUserStats(
   const failedTrades = transactions?.filter((t) => t.status === "cancelled" || t.status === "disputed").length || 0
   const successRate = totalTrades > 0 ? Math.round((successfulTrades / totalTrades) * 100) : 0
 
-  return {
-    averageRating,
-    successRate,
-    totalTrades,
-    successfulTrades,
-    failedTrades,
-  }
-}
+return (
+    <TransactionDetailClient
+      userId={user.id}  // <--- ADD THIS LINE RIGHT HERE
+      transaction={transaction}
+      buyerStats={buyerStats}
+      sellerStats={sellerStats}
+      existingReview={null}
+      existingEmbarkReport={null}
+      canReportToEmbark={false}
+      isDisputed={false}
+      dispute={null}
+      logs={[]}
+    />
+  )
