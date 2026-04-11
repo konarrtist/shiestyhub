@@ -3,11 +3,11 @@ export const runtime = "edge";
 import type React from "react"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { Sidebar } from "@/components/layout/sidebar"
-import { MobileNav } from "@/components/layout/mobile-nav"
-import { DashboardHeader } from "@/components/layout/dashboard-header"
+// CHANGE THESE:
+import { DashboardHeader } from "@/components/layout-parts/dashboard-header"
+import { Sidebar } from "@/components/layout-parts/sidebar"
+import { MobileNav } from "@/components/layout-parts/mobile-nav"
 import { deriveRole } from "@/lib/utils/roles"
-
 export default async function DashboardLayout({
   children,
 }: {
