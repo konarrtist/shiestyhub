@@ -51,7 +51,7 @@ export default async function MarketplacePage() {
                 <Avatar className="h-6 w-6 border border-slate-700">
                   <AvatarImage src={listing.profiles?.avatar_url} />
                   <AvatarFallback className="bg-slate-800 text-[10px]">
-                    {listing.profiles?.username?.[0]?.toUpperCase()}
+                    {listing.profiles?.username?.[0]?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-xs font-medium text-slate-300">
@@ -82,7 +82,6 @@ export default async function MarketplacePage() {
           <p>No listings found in the SHiESTY Hub.</p>
         </div>
       )}
-</div>
+    </div>
   )
-} 
 }
