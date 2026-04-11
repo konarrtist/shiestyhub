@@ -13,7 +13,7 @@ const nextConfig = {
 
   reactStrictMode: true,
 
-  // This ensures your images from Discord and Supabase actually show up
+  // This ensures your images from Discord and Supabase show up
   images: {
     remotePatterns: [
       {
@@ -28,4 +28,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
