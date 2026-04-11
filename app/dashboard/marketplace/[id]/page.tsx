@@ -1,69 +1,46 @@
 import { createClient } from "@/lib/supabase/server"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Search, Star, TrendingUp, Package, ArrowRightLeft } from "lucide-react"
+import { notFound } from "next/navigation"
+import { ArrowLeft, ShieldCheck } from "lucide-react"
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ListingImage } from "@/components/ui/listing-image"
+import { Button } from "@/components/ui/button"
 import { parsePaymentMethods } from "@/lib/utils/trade-items"
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+import { InitiateTradeButton } from "@/components/initiate-trade-button"
 
-export default async function MarketplacePage({
-  searchParams,
+export const dynamic = "force-dynamic"
+
+export default async function ListingDetailPage({
+  params,
 }: {
-  searchParams: Promise<{ search?: string }>
+  params: Promise<{ id: string }>
 }) {
-  const { search } = await searchParams
+  const { id } = await params
   const supabase = await createClient()
 
-  // Fetch listings from Supabase
-  const { data: listings } = await supabase
+  const { data: listing, error } = await supabase
     .from("listings")
-    .select("*, profiles(username, avatar_url)")
-    .order("created_at", { ascending: false })
+    .select(`*, profiles(username, avatar_url, rating)`)
+    .eq("id", id)
+    .single()
+
+  if (error || !listing) notFound()
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Marketplace</h2>
+    <main className="max-w-7xl mx-auto px-4 py-8 bg-slate-950 min-h-screen text-white">
+      <Link href="/dashboard/marketplace" className="flex items-center text-slate-500 hover:text-cyan-500 mb-8">
+        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Marketplace
+      </Link>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="lg:col-span-2">
+          <h1 className="text-3xl font-bold mb-4">{listing.title}</h1>
+          <p className="text-slate-300 mb-6">{listing.description}</p>
+        </div>
+        <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 h-fit">
+          <p className="text-3xl font-bold text-cyan-500 mb-6">{listing.price} $RD</p>
+          <InitiateTradeButton itemId={listing.id} ownerId={listing.seller_id} itemName={listing.title} />
+        </div>
       </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {listings?.map((listing) => (
-          <Card key={listing.id}>
-            <CardHeader>
-              <ListingImage src={listing.image_url} alt={listing.title} />
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-lg">{listing.title}</h3>
-                <Badge variant="secondary">{listing.category}</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                {listing.description}
-              </p>
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={listing.profiles?.avatar_url} />
-                  <AvatarFallback>{listing.profiles?.username?.[0]}</AvatarFallback>
-                </Avatar>
-                <span className="text-xs font-medium">{listing.profiles?.username}</span>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div className="font-mono font-bold text-primary">
-                {listing.price} $RD
-              </div>
-              <Link href={`/dashboard/marketplace/${listing.id}`}>
-                <Button size="sm">View Details</Button>
-              </Link>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    </div>
+    </main>
   )
 }
